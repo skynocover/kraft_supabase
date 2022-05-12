@@ -1,0 +1,55 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model tables {
+    id      Int       @id @default(autoincrement())
+    name    String
+    columns columns[]
+    rows    rows[]
+}
+
+model types {
+    id   Int    @id @default(autoincrement())
+    name String
+
+    columns columns[]
+}
+
+model columns {
+    id   Int    @id @default(autoincrement())
+    name String
+
+    type   types @relation(references: [id], fields: [typeId])
+    typeId Int
+
+    table     tables      @relation(references: [id], fields: [tableId])
+    tableId   Int
+    row_value row_value[]
+}
+
+model rows {
+    id   Int    @id @default(autoincrement())
+    name String
+
+    table   tables @relation(references: [id], fields: [tableId])
+    tableId Int
+
+    row_value row_value[]
+}
+
+model row_value {
+    id    Int  @id @default(autoincrement())
+    value Json
+
+    column   columns @relation(references: [id], fields: [columnId])
+    columnId Int
+
+    row   rows @relation(references: [id], fields: [rowId])
+    rowId Int
+}
